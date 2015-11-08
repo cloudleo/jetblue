@@ -1,25 +1,72 @@
-<p id="notice"><%= notice %></p>
 
-<h1>Listing Flights</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>Origin</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
+<h1 align="center" >JetBlue</h1>
 
-  <tbody>
-    <%@flights = Flight.all %>
-   
-    <% @flights.each do |flight| %>
-    <%= flight.origin%>
-    
-    <% end %>
-  </tbody>
-</table>
+<p>Click the button to get your coordinates.</p>
+
+<div id="googleMap"></div>
+
+<script src="http://maps.googleapis.com/maps/api/js"> </script>
+<script>
+
+
+function initialize(position) {
+ navigator.geolocation.getCurrentPosition(initialize);
+  var mapProp = {
+    center:new google.maps.LatLng( position.coords.latitude , position.coords.longitude),
+    zoom: 15,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map=new google.maps.Map(document.getElementById("googleMap"), mapProp);
+  var marker=new google.maps.Marker({
+  position:new google.maps.LatLng( position.coords.latitude, position.coords.longitude),
+  });
+marker.setMap(map);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+var myOptions = {
+zoom: 8,
+center: myLatlng,
+mapTypeId: google.maps.MapTypeId.ROADMAP
+}
+map = new google.maps.Map(document.getElementById("googleMap"), myOptions);
+places = new google.maps.places.PlacesService(map);
+google.maps.event.addListener(map, 'tilesloaded', tilesLoaded);
+autocomplete = new google.maps.places.Autocomplete(document.getElementById('autocomplete'));
+google.maps.event.addListener(autocomplete, 'place_changed', function() {
+showSelectedPlace();
+});
+</script>
+
+
+
 
 <br>
 
-<%= link_to 'New Flight', new_flight_path %>
+<%@flights = Flight.all %>
+   
+    <% @flights.each do |flight| %>
+       <% array = Array.new %>
+    <%if flight.origin.downcase == 'jfk' || flight.origin.downcase == 'lga' %>
+       
+    <%= " destination: #{flight.destination} -- Total Price: #{flight.jetblue_price} -- Hotel Check in: #{flight.hotel_check_in}" %> <br>
+    <% end %>
+<% end %>
+
+<style>
+
+  h1{
+
+    font-color: blue;
+  }
+ #googleMap {
+    margin-left: 0px;
+    margin-right: 25px;
+    width:100%;
+    height: 325px;
+  }
+
+
+</style>
